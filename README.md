@@ -4,6 +4,11 @@ This application is a simple CRUD created to demonstrate the MacawFramework. Wit
 you can call GET, POST and DELETE endpoints to get a list of existing persons in the database, creating
 a new person and deleting an existing person in the database, respectively.
 
+To run the application, just go to the application directory and run:
+```shell
+ruby main.rb
+```
+
 ## GET
 ```curl
 curl --location --request GET 'localhost:8080/list_all_people'
