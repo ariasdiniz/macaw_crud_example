@@ -14,12 +14,12 @@ ActiveRecord::Base.establish_connection(YAML.safe_load(db_config))
 server = MacawFramework::Macaw.new
 
 # Defining a GET endpoint to list all persons in the database
-server.get('/list_all_people') do |headers, body|
+server.get('/list_all_people') do |headers, body, parameters|
   return Person.all.as_json, 200
 end
 
 # Defining a POST endpoint to create a new person in the database
-server.post('/add_new_person') do |headers, body|
+server.post('/add_new_person') do |headers, body, parameters|
   begin
     parsed_body = JSON.parse(body)
     name = parsed_body['name']
@@ -36,7 +36,7 @@ server.post('/add_new_person') do |headers, body|
 end
 
 # Defining a DELETE endpoint to delete an existing person in the database
-server.delete('/delete_person') do |headers, body|
+server.delete('/delete_person') do |headers, body, parameters|
   begin
     parsed_body = JSON.parse(body)
     id = parsed_body['id']
