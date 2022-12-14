@@ -5,8 +5,13 @@ you can call GET, POST and DELETE endpoints to get a list of existing persons in
 a new person and deleting an existing person in the database, respectively.
 
 To run the application, just go to the application directory and run:
+
 ```shell
-ruby main.rb
+$ bundle install
+```
+and then
+```shell
+$ ruby main.rb
 ```
 
 ## GET
