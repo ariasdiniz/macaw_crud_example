@@ -14,14 +14,19 @@ ActiveRecord::Base.establish_connection(YAML.safe_load(db_config))
 server = MacawFramework::Macaw.new
 
 # Defining a GET endpoint to list all persons in the database
-server.get('/list_all_people') do |headers, body, parameters|
+server.get('/people') do |context|
   return Person.all.as_json, 200
 end
 
+# Defining a GET endpoint to recover person with provided id
+server.get('/people/:person_id') do |context|
+  return Person.find(context[:params][:person_id]).as_json, 200
+end
+
 # Defining a POST endpoint to create a new person in the database
-server.post('/add_new_person') do |headers, body, parameters|
+server.post('/add_new_person') do |context|
   begin
-    parsed_body = JSON.parse(body)
+    parsed_body = JSON.parse(context[:body])
     name = parsed_body['name']
     age = parsed_body['age']
     raise UnprocessableBodyError if name.nil? || age.nil?
@@ -36,9 +41,9 @@ server.post('/add_new_person') do |headers, body, parameters|
 end
 
 # Defining a DELETE endpoint to delete an existing person in the database
-server.delete('/delete_person') do |headers, body, parameters|
+server.delete('/delete_person') do |context|
   begin
-    parsed_body = JSON.parse(body)
+    parsed_body = JSON.parse(context[:body])
     id = parsed_body['id']
     raise UnprocessableBodyError.new('Please inform a JSON body with an "id" parameter') if id.nil?
 
