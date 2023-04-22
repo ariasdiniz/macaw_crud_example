@@ -1,0 +1,11 @@
+{
+  "macaw": {
+    "threads": 10,
+    "cache": {
+      "cache_invalidation": 1000
+    },
+    "prometheus": {
+      "endpoint": "/metrics"
+    }
+  }
+}

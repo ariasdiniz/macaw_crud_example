@@ -8,19 +8,19 @@ require_relative './lib/errors/unprocessable_body_error'
 
 # Configuring ActiveRecord
 db_config = File.open('./db/database.yaml')
-ActiveRecord::Base.establish_connection(YAML.safe_load(db_config))
+ActiveRecord::Base.establish_connection(YAML.safe_load(db_config, aliases: true))
 
 # Instantiating MacawFramework Class
 server = MacawFramework::Macaw.new
 
 # Defining a GET endpoint to list all persons in the database
-server.get('/people') do |context|
+server.get('/people', cache: true) do |context|
   return Person.all.as_json, 200
 end
 
 # Defining a GET endpoint to recover person with provided id
 server.get('/people/:person_id') do |context|
-  return Person.find(context[:params][:person_id]).as_json, 200
+  return Person.where(id: context[:params][:person_id]).first.as_json, 200
 end
 
 # Defining a POST endpoint to create a new person in the database
@@ -40,6 +40,24 @@ server.post('/add_new_person') do |context|
   end
 end
 
+server.patch('/people/:person_id') do |context|
+  raise UnprocessableBodyError.new unless context[:params][:person_id]
+
+  body = JSON.parse(context[:body])
+  name = ActiveRecord::Base.connection.quote(body["name"])
+  age = ActiveRecord::Base.connection.quote(body["age"])
+  Person.update(
+    context[:params][:person_id].to_i,
+    name: name,
+    age: age
+  )
+  [JSON.pretty_generate({ message: "Updated person #{context[:params][:person_id]}" }), 200]
+rescue UnprocessableBodyError
+  ["Person with id #{context[:params][:person_id]} does not exist", 400]
+rescue StandardError => e
+  [JSON.pretty_generate(e.message), 500]
+end
+
 # Defining a DELETE endpoint to delete an existing person in the database
 server.delete('/delete_person') do |context|
   begin
@@ -47,10 +65,15 @@ server.delete('/delete_person') do |context|
     id = parsed_body['id']
     raise UnprocessableBodyError.new('Please inform a JSON body with an "id" parameter') if id.nil?
 
-    Person.delete(id.to_i)
-    return "Person deleted.", 200
+    person = Person.find_by(id: id.to_i)
+    if person.nil?
+      return JSON.pretty_generate({ error: "Person with ID #{id} not found." }), 404
+    else
+      person.destroy
+      return JSON.pretty_generate("Person with ID #{id} deleted."), 200
+    end
   rescue UnprocessableBodyError => e
-    return JSON.pretty_generate({ error: e }), 422
+    return JSON.pretty_generate({ error: e.message }), 422
   rescue StandardError => e
     return JSON.pretty_generate({ error: e }), 500
   end
