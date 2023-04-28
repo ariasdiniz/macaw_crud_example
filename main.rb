@@ -14,13 +14,13 @@ ActiveRecord::Base.establish_connection(YAML.safe_load(db_config, aliases: true)
 server = MacawFramework::Macaw.new
 
 # Defining a GET endpoint to list all persons in the database
-server.get('/people', cache: true) do |context|
-  return Person.all.as_json, 200
+server.get('/people', cache: true) do |_context|
+  return JSON.pretty_generate(Person.all.as_json), 200, {"Content-Type" => "application/json", "random-header" => "random value"}
 end
 
 # Defining a GET endpoint to recover person with provided id
 server.get('/people/:person_id') do |context|
-  return Person.where(id: context[:params][:person_id]).first.as_json, 200
+  return JSON.pretty_generate(Person.where(id: context[:params][:person_id]).first.as_json), 200
 end
 
 # Defining a POST endpoint to create a new person in the database
@@ -32,7 +32,7 @@ server.post('/add_new_person') do |context|
     raise UnprocessableBodyError if name.nil? || age.nil?
 
     Person.create!(name: name, age: age)
-    return "Person created with success!!!", 201
+    return JSON.pretty_generate({ message: "Person created with success!!!" }), 201
   rescue UnprocessableBodyError => e
     return JSON.pretty_generate({ error: e }), 422
   rescue StandardError => e
@@ -79,5 +79,5 @@ server.delete('/delete_person') do |context|
   end
 end
 
-# Sta
+# Start Server
 server.start!
