@@ -1,8 +1,10 @@
-FROM ruby:latest
+FROM ruby:3.2.0-slim-bullseye
+
+ENV RUBY_YJIT_ENABLE=1
 
 WORKDIR /app
 
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile ./
 
 RUN bundle install
 
