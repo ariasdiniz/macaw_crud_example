@@ -3,17 +3,17 @@
     "threads": 10,
     "bind": "0.0.0.0",
     "cache": {
-      "cache_invalidation": 1000
+      "cache_invalidation": 1000,
+      "ignore_headers": [
+        "Postman-Token"
+      ]
     },
     "prometheus": {
       "endpoint": "/metrics"
     },
     "rate_limiting": {
       "window": 10,
-      "max_requests": 10,
-      "ignore_headers": [
-        "Postman-Token"
-      ]
+      "max_requests": 10
     }
   }
 }
