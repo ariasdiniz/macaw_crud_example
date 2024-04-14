@@ -14,7 +14,7 @@ ActiveRecord::Base.establish_connection(YAML.safe_load(db_config, aliases: true)
 server = MacawFramework::Macaw.new
 
 # Defining a GET endpoint to list all persons in the database
-server.get('/people', cache: true) do |_context|
+server.get('/people') do |_context|
   return JSON.pretty_generate(Person.all.as_json), 200, {"Content-Type" => "application/json", "random-header" => "random value"}
 end
 

@@ -3,10 +3,7 @@
     "threads": 10,
     "bind": "0.0.0.0",
     "cache": {
-      "cache_invalidation": 1000,
-      "ignore_headers": [
-        "Postman-Token"
-      ]
+      "cache_invalidation": 1000
     },
     "prometheus": {
       "endpoint": "/metrics"
